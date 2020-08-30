@@ -12,12 +12,14 @@ import (
 	"strings"
 )
 
+// Provider ...
 var Provider string
 
+// TVChannel ...
 type TVChannel struct {
 	Name string `json:"name"`
 	Provider string `json:"provider"`
-	Url string `json:"url"`
+	URL string `json:"url"`
 	Source string `json:"source"`
 }
 
@@ -57,25 +59,26 @@ func convertToStruct(m3u []byte) ([]TVChannel, error){
 	return TvChannels, nil
 }
 
-func init()  {
-	flag.StringVar(&Provider, "p", "Edem", "Provider name")
-}
 
 func main()  {
+	flag.StringVar(&Provider, "p", "Edem", "Provider name")
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
 		flag.Usage()
 		log.Fatalln("Url should be specifically")
 	}
+
 	m3u, err := getM3U(flag.Args()[len(flag.Args())-1])
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	channels, err := convertToStruct(m3u)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	
 	data, err := json.MarshalIndent(channels, "", " ")
 	if err != nil {
 		log.Fatalln(err)
