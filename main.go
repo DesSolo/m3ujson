@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -11,6 +12,9 @@ import (
 	"regexp"
 	"strings"
 )
+
+// AppVersion application version
+const AppVersion = "1.0.0"
 
 // provider is variable of provider name like Edem, etc
 var provider string
@@ -65,8 +69,14 @@ func convertToStruct(m3u []byte) ([]TVChannel, error) {
 }
 
 func main() {
+	version := flag.Bool("version", false, "Show version and exit")
 	flag.StringVar(&provider, "p", "Edem", "Provider name")
 	flag.Parse()
+
+	if *version {
+		fmt.Println(AppVersion)
+		os.Exit(0)
+	}
 
 	if len(flag.Args()) < 1 {
 		flag.Usage()
