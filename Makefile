@@ -1,22 +1,24 @@
-PROJECTNAME="m3ujson"
-BUILD_DIRECTORY="bin"
-VERSION=${shell grep "const AppVersion" main.go | cut -d '"' -f 2}
+LOCAL_BIN := $(CURDIR)/bin
 
-clean:
-	@echo "  >  Clean directory..."
-	@rm -rf bin
+MAIN_FILE_PATH=cmd/main.go
 
-build: clean
-	@echo "  >  Building binary..."
-	@go build -o ${BUILD_DIRECTORY}/${PROJECTNAME}-${VERSION}
+tidy:
+	go mod tidy
 
-run:
-	@echo "  >  Run..."
-	@go run ${FILE}
+.prep_bin:
+	mkdir -p ${LOCAL_BIN}
 
-compile: clean
-	@echo "  >  Build binary all arch..."
-	@echo "+linux amd64"
-	@GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o ${BUILD_DIRECTORY}/${PROJECTNAME}-${VERSION}-linux-amd64
-	@echo "+mipsle"
-	@GOOS=linux GOARCH=mipsle go build -ldflags "-s -w" -o ${BUILD_DIRECTORY}/${PROJECTNAME}-${VERSION}-mipsle
+GORELEASER_VERSION=v2.11.2
+
+.install-goreleaser:
+	curl -Ls https://github.com/goreleaser/goreleaser/releases/download/${GORELEASER_VERSION}/goreleaser_Linux_x86_64.tar.gz | tar xvz -C ${LOCAL_BIN} goreleaser
+
+install-deps: \
+	.prep_bin \
+	.install-goreleaser
+
+release:
+	${LOCAL_BIN}/goreleaser release --clean
+
+try-release:
+	${LOCAL_BIN}/goreleaser release --snapshot --clean
